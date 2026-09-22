@@ -1,0 +1,79 @@
+@import "@fontsource-variable/inter";
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+
+  /* Light */
+  --color-background: oklch(0.985 0.002 247);
+  --color-foreground: oklch(0.23 0.015 250);
+  --color-card: oklch(1 0 0);
+  --color-card-foreground: oklch(0.23 0.015 250);
+  --color-popover: oklch(1 0 0);
+  --color-popover-foreground: oklch(0.23 0.015 250);
+  --color-primary: oklch(0.55 0.2 262);
+  --color-primary-foreground: oklch(0.99 0 0);
+  --color-secondary: oklch(0.95 0.01 250);
+  --color-secondary-foreground: oklch(0.3 0.02 250);
+  --color-muted: oklch(0.95 0.005 250);
+  --color-muted-foreground: oklch(0.55 0.02 250);
+  --color-accent: oklch(0.93 0.02 262);
+  --color-accent-foreground: oklch(0.35 0.05 262);
+  --color-destructive: oklch(0.6 0.22 25);
+  --color-destructive-foreground: oklch(0.99 0 0);
+  --color-border: oklch(0.9 0.01 250);
+  --color-input: oklch(0.9 0.01 250);
+  --color-ring: oklch(0.6 0.16 262);
+  --color-success: oklch(0.6 0.15 150);
+  --color-warning: oklch(0.7 0.14 70);
+}
+
+.dark {
+  --color-background: oklch(0.16 0.012 255);
+  --color-foreground: oklch(0.94 0.004 250);
+  --color-card: oklch(0.19 0.014 255);
+  --color-card-foreground: oklch(0.94 0.004 250);
+  --color-popover: oklch(0.2 0.015 255);
+  --color-popover-foreground: oklch(0.94 0.004 250);
+  --color-primary: oklch(0.65 0.16 262);
+  --color-primary-foreground: oklch(0.16 0.02 262);
+  --color-secondary: oklch(0.25 0.015 255);
+  --color-secondary-foreground: oklch(0.9 0.004 250);
+  --color-muted: oklch(0.24 0.012 255);
+  --color-muted-foreground: oklch(0.65 0.015 250);
+  --color-accent: oklch(0.27 0.02 262);
+  --color-accent-foreground: oklch(0.95 0.004 250);
+  --color-destructive: oklch(0.6 0.22 25);
+  --color-destructive-foreground: oklch(0.99 0 0);
+  --color-border: oklch(0.28 0.015 255);
+  --color-input: oklch(0.28 0.015 255);
+  --color-ring: oklch(0.65 0.16 262);
+  --color-success: oklch(0.62 0.14 150);
+  --color-warning: oklch(0.74 0.13 70);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+::selection {
+  background: color-mix(in oklab, var(--color-primary) 25%, transparent);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--color-foreground) 20%, transparent) transparent;
+}
+
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-border);
+  }
+}

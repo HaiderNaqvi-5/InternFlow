@@ -1,0 +1,52 @@
+# Environment / secrets
+.env
+.env.*
+!.env.example
+*.env.local
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+dist/
+
+# Node
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+
+# Uploads / generated files (keep directory structure)
+storage/uploads/*
+storage/task_attachments/*
+storage/submissions/*
+storage/signatures/*
+storage/certificates/*
+storage/reports/*
+backend/storage/uploads/*
+backend/storage/task_attachments/*
+backend/storage/submissions/*
+backend/storage/signatures/*
+backend/storage/certificates/*
+backend/storage/reports/*
+!storage/uploads/.gitkeep
+!storage/task_attachments/.gitkeep
+!storage/submissions/.gitkeep
+!storage/signatures/.gitkeep
+!storage/certificates/.gitkeep
+!storage/reports/.gitkeep
+
+# Database backups
+database/backups/*
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
