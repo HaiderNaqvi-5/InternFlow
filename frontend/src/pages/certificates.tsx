@@ -12,7 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TBody, TD, TH, THead, TR } from '@/components/ui/table'
 import { api, ApiError } from '@/lib/api'
 import { formatDate } from '@/lib/format'
-import type { CertificatesResponse, PaginatedBatches, PaginatedUsers } from '@/lib/types'
+import type { Certificate, PaginatedBatches, PaginatedUsers } from '@/lib/types'
 
 export default function CertificatesPage() {
   const qc = useQueryClient()
@@ -22,7 +22,7 @@ export default function CertificatesPage() {
 
   const certs = useQuery({
     queryKey: ['certificates'],
-    queryFn: () => api.get<CertificatesResponse>('/api/v1/certificates'),
+    queryFn: () => api.get<Certificate[]>('/api/v1/certificates'),
   })
   const batches = useQuery({
     queryKey: ['batches'],
@@ -54,6 +54,7 @@ export default function CertificatesPage() {
   const internName = (id: number) => interns.data?.items.find((u) => u.id === id)?.full_name ?? `Intern #${id}`
   const batchName = (id: number | null) =>
     id == null ? '—' : batches.data?.items.find((b) => b.id === id)?.name ?? `Batch #${id}`
+  const certificateItems = certs.data ?? []
 
   return (
     <div>
@@ -141,14 +142,14 @@ export default function CertificatesPage() {
                     <Skeleton className="h-8" />
                   </TD>
                 </TR>
-              ) : !certs.data || certs.data.items.length === 0 ? (
+              ) : certificateItems.length === 0 ? (
                 <TR>
                   <TD>
                     <EmptyState title="No certificates" description="Issued certificates will appear here." />
                   </TD>
                 </TR>
               ) : (
-                certs.data.items.map((c) => (
+                certificateItems.map((c) => (
                   <TR key={c.id}>
                     <TD className="font-medium">{internName(c.intern_id)}</TD>
                     <TD className="text-muted-foreground">{batchName(c.batch_id)}</TD>

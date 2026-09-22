@@ -8,6 +8,24 @@ submissions and reviews, attendance tracking, leave requests, calendar,
 notifications (REST + WebSocket), analytics, reports, certificates and outcome
 processing.
 
+## Product preview
+
+### Intern workspace
+
+![Intern dashboard](docs/screenshots/intern-dashboard.png)
+
+### Instructor workspace
+
+![Instructor dashboard](docs/screenshots/instructor-dashboard.png)
+
+### Admin operations
+
+![Admin dashboard](docs/screenshots/admin-dashboard.png)
+
+### Certificate management
+
+![Certificates](docs/screenshots/certificates.png)
+
 ## Stack
 
 - **Frontend** — React 19 + Vite + TypeScript, React Router 7, TanStack Query,

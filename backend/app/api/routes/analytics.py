@@ -169,6 +169,8 @@ def _all_supervised_stats(db: Session, user: User, allowed: set[int]):
     late = 0
     scores: list[float] = []
     attendance_rows: list[AttendanceRecord] = []
+    task_rows: list[Task] = []
+    submission_rows: list[Submission] = []
     capacities = [b.capacity for b in batches if b.status.value == "active"]
 
     for b in batches:
@@ -182,6 +184,7 @@ def _all_supervised_stats(db: Session, user: User, allowed: set[int]):
             active_interns += active_interns_for_batch
         intern_ids.update(m.intern_id for m in members)
         tasks = db.execute(select(Task).where(Task.batch_id == b.id)).scalars().all()
+        task_rows.extend(tasks)
         tasks_total += len(tasks)
         overdue += sum(
             1 for t in tasks
@@ -189,6 +192,7 @@ def _all_supervised_stats(db: Session, user: User, allowed: set[int]):
             and _task_not_approved(db, t)
         )
         subs = db.execute(select(Submission).where(Submission.batch_id == b.id)).scalars().all()
+        submission_rows.extend(subs)
         pending_reviews += sum(1 for s in subs if s.status.value == "pending")
         late += sum(1 for s in subs if s.is_late)
         for s in subs:
@@ -202,11 +206,35 @@ def _all_supervised_stats(db: Session, user: User, allowed: set[int]):
     present = sum(1 for a in attendance_rows if a.check_in is not None)
     total_days = len(attendance_rows)
     avg_score = round(sum(scores) / len(scores), 2) if scores else 0.0
+    tasks_by_category: dict[str, int] = {}
+    for task in task_rows:
+        category = task.category.value if task.category else "Other"
+        tasks_by_category[category] = tasks_by_category.get(category, 0) + 1
+
+    per_intern = []
+    for intern_id in sorted(intern_ids):
+        intern = db.get(User, intern_id)
+        intern_tasks = [
+            task for task in task_rows
+            if task.scope.value == "batch" or task.assignee_id == intern_id
+        ]
+        intern_submissions = [submission for submission in submission_rows if submission.intern_id == intern_id]
+        approved = sum(1 for submission in intern_submissions if submission.status.value == "approved")
+        intern_scores = [review.score for submission in intern_submissions for review in submission.reviews]
+        per_intern.append(
+            {
+                "intern_id": intern_id,
+                "intern_name": intern.full_name if intern else f"Intern #{intern_id}",
+                "completion_rate": round(approved / len(intern_tasks) * 100, 1) if intern_tasks else 0.0,
+                "average_score": round(sum(intern_scores) / len(intern_scores), 2) if intern_scores else None,
+            }
+        )
 
     return {
         "batches_total": len(batches),
         "active_batches": sum(1 for b in batches if b.status.value == "active"),
         "active_interns": active_interns,
+        "interns_active": active_interns,
         "batch_capacity": min(capacities) if capacities else 0,
         "tasks_total": tasks_total,
         "pending_reviews": pending_reviews,
@@ -214,8 +242,11 @@ def _all_supervised_stats(db: Session, user: User, allowed: set[int]):
         "late_submissions": late,
         "average_score": avg_score,
         "attendance_rate": round(present / total_days * 100, 1) if total_days else 0.0,
+        "batch_attendance_rate": round(present / total_days * 100, 1) if total_days else 0.0,
         "total_attendance_days": total_days,
         "total_hours": round(sum(a.worked_hours or 0.0 for a in attendance_rows), 1),
+        "tasks_by_category": tasks_by_category,
+        "per_intern": per_intern,
     }
 
 
@@ -277,6 +308,7 @@ def hr_analytics(
     scores: list[float] = []
     attendance_rows: list[AttendanceRecord] = []
     leave_rows = db.execute(select(LeaveRequest)).scalars().all()
+    all_submissions: list[Submission] = []
 
     for b in active_batches:
         intern_ids = db.execute(
@@ -290,6 +322,7 @@ def hr_analytics(
         task_count += len(tasks)
         overdue += sum(1 for t in tasks if t.deadline < utcnow() and _task_not_approved(db, t))
         subs = db.execute(select(Submission).where(Submission.batch_id == b.id)).scalars().all()
+        all_submissions.extend(subs)
         late += sum(1 for s in subs if s.is_late)
         scores.extend(r.score for s in subs for r in s.reviews)
         attendance_rows.extend(
@@ -324,7 +357,13 @@ def hr_analytics(
 
     return {
         "active_batches": len(active_batches),
+        "total_interns": total_interns,
         "active_interns": active_interns,
+        "avg_completion_rate": round(
+            sum(1 for s in all_submissions if s.status.value == "approved") / task_count * 100,
+            1,
+        ) if task_count else 0.0,
+        "avg_score": round(sum(scores) / len(scores), 2) if scores else 0.0,
         "batches_capacity_total": total_capacity,
         "tasks_total": task_count,
         "overdue_tasks": overdue,
@@ -336,4 +375,13 @@ def hr_analytics(
         "leave_approved": approved_leaves,
         "leave_pending": pending_leaves,
         "batch_trends": batch_trends,
+        "interns_by_batch": [
+            {"batch_id": row["batch_id"], "batch_name": row["name"], "count": row["interns"]}
+            for row in batch_trends
+        ],
+        "completion_by_status": {
+            status: sum(1 for submission in all_submissions if submission.status.value == status)
+            for status in {submission.status.value for submission in all_submissions}
+        },
+        "up_for_completion": [],
     }
