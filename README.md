@@ -3,7 +3,9 @@
 > A full-stack operations hub for running internships—from onboarding and task
 > delivery to attendance, reviews, reporting, and completion certificates.
 
-![InternFlow product preview](frontend/src/assets/hero.png)
+## Product preview
+
+![InternFlow sign-in screen](docs/screenshots/sign-in.png)
 
 Full-stack internship operations platform: batch management, task assignment,
 submissions and reviews, attendance tracking, leave requests, calendar,
