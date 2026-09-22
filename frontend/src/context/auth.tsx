@@ -38,6 +38,8 @@ async function doLogin(email: string, password: string): Promise<UserMe> {
 async function doPostLogin(res: Awaited<ReturnType<typeof authApi.login>>): Promise<UserMe> {
   localStorage.setItem(ACCESS_KEY, res.access_token)
   localStorage.setItem(REFRESH_KEY, res.refresh_token)
+  // Make the newly issued token available to the API client before loading /me.
+  setTokens({ accessToken: res.access_token, refreshToken: res.refresh_token })
   const me = await authApi.me()
   if (store) {
     store.setAccessToken(res.access_token)
