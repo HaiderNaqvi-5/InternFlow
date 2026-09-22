@@ -14,13 +14,19 @@ processing.
 
 ![Intern dashboard](docs/screenshots/intern-dashboard.png)
 
+![Intern task management](docs/screenshots/intern-tasks.png)
+
 ### Instructor workspace
 
 ![Instructor dashboard](docs/screenshots/instructor-dashboard.png)
 
+![Submission reviews](docs/screenshots/instructor-reviews.png)
+
 ### Admin operations
 
 ![Admin dashboard](docs/screenshots/admin-dashboard.png)
+
+![User management](docs/screenshots/admin-users.png)
 
 ### Certificate management
 
